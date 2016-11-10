@@ -1,0 +1,20 @@
+begin
+num1 = 1+1
+num2 =2+2
+result =0
+if num1< num2
+then result= num1 *num2
+else if num1>=num2
+then result =num1/ num2
+else result = num1 - num2
+123.
+123.e-1
+123.e1
+123E+5
+123E02
+123.12
+123.e1
+123E+5
+123e
+123.E
+end

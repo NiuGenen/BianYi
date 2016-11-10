@@ -1,0 +1,5 @@
+﻿  BIANYI.cpp
+d:\桌面文件\我的文档\visual studio 2015\projects\bianyi\bianyi\bianyi.cpp(140): warning C4715: 'CP_HELP': not all control paths return a value
+d:\桌面文件\我的文档\visual studio 2015\projects\bianyi\bianyi\bianyi.cpp(165): warning C4715: 'IP_HELP': not all control paths return a value
+  BianYi.vcxproj -> d:\桌面文件\我的文档\visual studio 2015\Projects\BianYi\Debug\BianYi.exe
+  BianYi.vcxproj -> d:\桌面文件\我的文档\visual studio 2015\Projects\BianYi\Debug\BianYi.pdb (Partial PDB)
