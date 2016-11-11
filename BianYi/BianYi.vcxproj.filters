@@ -42,6 +42,12 @@
     <ClCompile Include="BIANYI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LL1G.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="hash.h">
@@ -51,6 +57,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="scaning.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LL1G.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stack.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

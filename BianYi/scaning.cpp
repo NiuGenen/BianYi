@@ -50,6 +50,8 @@ static char *token_to_str(_TOKEN_STATE_ token) {
 _TOKEN_TYPE_ token_to_type(_TOKEN_STATE_ token) {
 	_TOKEN_TYPE_ ret;
 	ret.word = token.word;
+	ret.scaning_col = token.scaning_col;
+	ret.scaning_row = token.scaning_row;
 
 	if (token.state == STATE_ID_KEY && isKeyWord(token.word)) {
 		token.state = 0;
@@ -109,6 +111,12 @@ static int idChar(char c) {
 	else return CHAR_UND;
 }
 
+_TOKEN_LIST_ token_vary_list;
+static int token_vary_list_init = 0;
+
+_TOKEN_LIST_ token_const_list;
+static int token_const_list_init = 0;
+
 static char scaning_char;
 static char scaning_word[50] = { 0 };
 static int scaning_word_pos = 0;
@@ -121,9 +129,20 @@ static int scaning_cur_char_type = 0;
 static int scanning_loop = 1;
 
 static long scaning_offset = 0;
+static int scaning_col = 1;
+static int scaning_row = 1;
 
 _TOKEN_TYPE_ scaning_get_token() 
 {
+	if (!token_vary_list_init) {
+		token_list_init(&token_vary_list, TOKEN_VARY_LIST_CONTAIN);
+		token_vary_list_init = 1;
+	}
+	if (!token_const_list_init) {
+		token_list_init(&token_const_list, TOKEN_VARY_LIST_CONTAIN);
+		token_const_list_init = 1;
+	}
+
 	fseek(in, scaning_offset, SEEK_SET);
 	while (scanning_loop) {
 		if (!scaning_need_this_char) {
@@ -205,8 +224,11 @@ _TOKEN_TYPE_ scaning_get_token()
 				scaning_word[scaning_word_pos++] = scaning_char;
 			}
 			else if (scaning_cur_char_type == CHAR_ENTER || scaning_cur_char_type == CHAR_SPACE) {
-				//if (scaning_cur_char_type == CHAR_ENTER)
+				if (scaning_cur_char_type == CHAR_ENTER){
+					++scaning_col;
+					scaning_row = 1;
 					//printf("\n");
+				}
 				continue;
 			}
 			else {
@@ -379,8 +401,13 @@ _TOKEN_TYPE_ scaning_get_token()
 
 			if (scaning_word_pos != 0) {
 				scaning_word[scaning_word_pos] = '\0';
-				token.word = scaning_word;
+				int strlen_word = strlen(scaning_word) + 1;
+				token.word = (char*)malloc(sizeof(char)*strlen_word);
+				strcpy_s(token.word, strlen_word,scaning_word);
 				token.state = scanning_state;
+				token.scaning_col = scaning_col;
+				token.scaning_row = scaning_row;
+				scaning_row += 1;
 				ret = 1;
 				scaning_offset = ftell(in);
 				//char *str = token_to_str(token);
@@ -389,6 +416,8 @@ _TOKEN_TYPE_ scaning_get_token()
 				//}
 			}
 			if (scaning_cur_char_type == CHAR_ENTER || scaning_cur_char_type == CHAR_SPACE) {
+				if(scaning_cur_char_type == CHAR_ENTER)
+					++scaning_col;
 				scaning_need_this_char = 0;
 			}
 			//if (char_type == CHAR_ENTER) {
@@ -397,7 +426,14 @@ _TOKEN_TYPE_ scaning_get_token()
 			scanning_state = STATE_START;
 			scaning_word_pos = 0;
 
-			if(ret) return token_to_type(token);
+			if (ret) {
+				_TOKEN_TYPE_ _token = token_to_type(token);
+				if(_token.type == TOKEN_ID)
+					token_vary_list.addToken( &token_vary_list, &_token);
+				else if(_token.type == TOKEN_NUM)
+					token_const_list.addToken(&token_const_list, &_token);
+				return _token;
+			}
 		}
 	}
 
@@ -421,4 +457,35 @@ void scaning_init(const char * filename) {
 	//}
 	//pause();
 	//exit(0);
+}
+
+void _list_add_token(_TOKEN_LIST_ *list, _TOKEN_TYPE_ *token) {
+	for (int i = 0; i < list->contain; ++i) {
+		if (list->mark[i] == 0) {
+			list->mark[i] = 1;
+			list->tokens[i] = *token;
+			list->length += 1;
+			break;
+		}
+	}
+}
+
+void _list_rmv_token(_TOKEN_LIST_ *list, _TOKEN_TYPE_ *token) {
+	for (int i = 0; i < list->contain; ++i) {
+		if (list->mark[i] == 1 && list->tokens[i].type == token->type && list->tokens[i].scaning_col == token->scaning_col && list->tokens[i].scaning_row == token->scaning_row &&
+			strcmp(list->tokens[i].word, token->word) == 0) {
+			list->mark[i] = 0;
+			list->length -= 1;
+		}
+	}
+}
+
+void token_list_init(_TOKEN_LIST_ *list, int contain) {
+	list->length = 0;
+	list->contain = contain;
+	list->tokens = (_TOKEN_TYPE_*)malloc(SIZEOF_TOKEN_TYPE*contain);
+	list->mark = (int *)malloc(sizeof(int)*contain);
+	memset(list->mark, 0, contain*sizeof(int));
+	list->addToken = _list_add_token;
+	list->rmvToken = _list_rmv_token;
 }

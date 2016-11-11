@@ -1,5 +1,7 @@
 #pragma once
 
+#include"hashtable.h"
+
 #define	STATE_START		0
 #define STATE_ALPHA		1
 #define STATE_ID_KEY	2
@@ -56,12 +58,32 @@
 typedef struct {
 	char *word;
 	int state;
+	int scaning_col;
+	int scaning_row;
 }_TOKEN_STATE_;
 
 typedef struct {
 	char *word;
 	int type;
+	int scaning_col;
+	int scaning_row;
 }_TOKEN_TYPE_;
+#define SIZEOF_TOKEN_TYPE (sizeof(_TOKEN_TYPE_))
+
+typedef struct _TOKEN_LIST_
+{
+	_TOKEN_TYPE_ *tokens;
+	int *mark;
+	int length;
+	int contain;
+	void(*addToken)(struct _TOKEN_LIST_ *list, _TOKEN_TYPE_ *token);
+	void(*rmvToken)(struct _TOKEN_LIST_ *list, _TOKEN_TYPE_ *token);
+}_TOKEN_LIST_;
+#define TOKEN_VARY_LIST_CONTAIN	1024
+
+void token_list_init(_TOKEN_LIST_ *list, int contain);
+void _list_add_token(_TOKEN_LIST_ *list, _TOKEN_TYPE_ *token);
+void _list_rmv_token(_TOKEN_LIST_ *list, _TOKEN_TYPE_ *token);
 
 _TOKEN_TYPE_ scaning_get_token();
 void scaning_init(const char * filename);

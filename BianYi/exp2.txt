@@ -2,6 +2,6 @@ begin
 value1:=10+10;
 value2:=10/2;
 value3:=value1+value2*5;
-value4:=123.4*(15.1+8)
-a:=(b+(c/d)-e+h*e)
+value4:=123.4*(15.1+8);
+a:=(b+(c/d)-(e+h)*e);
 end

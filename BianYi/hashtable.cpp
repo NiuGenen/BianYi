@@ -3,18 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct _Hash_Node
-{
-	char * str;
-	struct _Hash_Node * next;
-}_Hash_Node;
-
-typedef struct _Hash_Table {
-	_Hash_Node **buckets;
-	int length;
-	unsigned int (*hashfunc)(char *str);
-}_Hash_Table;
-
 _Hash_Table _hashtable;
 
 #define SIZE_HASH_NODE (sizeof(_Hash_Node))
